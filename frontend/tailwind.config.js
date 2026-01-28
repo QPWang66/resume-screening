@@ -7,23 +7,43 @@ export default {
     theme: {
         extend: {
             colors: {
+                // Earthy/Clay Palette
+                background: '#f2f0e9', // Warm alabaster/sand
+                surface: '#ffffff',
+
                 primary: {
-                    50: '#f0f9ff',
-                    100: '#e0f2fe',
-                    200: '#bae6fd',
-                    300: '#7dd3fc',
-                    400: '#38bdf8',
-                    500: '#0ea5e9',
-                    600: '#0284c7',
-                    700: '#0369a1',
-                    800: '#075985',
-                    900: '#0c4a6e',
-                    950: '#082f49',
+                    DEFAULT: '#e65100', // International Orange / Burnt Orange
+                    hover: '#c2410c',
+                    light: '#ffccbc',
                 },
+
+                secondary: {
+                    DEFAULT: '#1c1917', // Warm Black/Charcoal
+                    dim: '#44403c',
+                },
+
+                accent: {
+                    green: '#15803d',
+                    red: '#b91c1c',
+                    yellow: '#a16207',
+                }
             },
             fontFamily: {
-                sans: ['Inter', 'system-ui', 'sans-serif'],
+                sans: ['Outfit', 'sans-serif'],
+                serif: ['Fraunces', 'serif'],
+                display: ['Fraunces', 'serif'],
             },
+            borderRadius: {
+                'lg': '0.75rem',
+                'xl': '1rem',
+                '2xl': '1.5rem',
+                '3xl': '2rem',
+            },
+            boxShadow: {
+                'sharp': '4px 4px 0px 0px rgba(0,0,0,1)', // Brutalist shadow
+                'sharp-sm': '2px 2px 0px 0px rgba(0,0,0,1)',
+                'sharp-lg': '8px 8px 0px 0px rgba(0,0,0,1)',
+            }
         },
     },
     plugins: [],

@@ -47,7 +47,17 @@ async def start_screening(
     session.commit()
     session.refresh(db_session)
     
-    return db_session
+    # Manually construct response to parse JSON string
+    return SessionResponse(
+        id=str(db_session.id), # UUID to str
+        status=db_session.status,
+        created_at=db_session.created_at,
+        criteria_human_readable=db_session.criteria_human_readable,
+        criteria_json=json.loads(db_session.criteria_json) if db_session.criteria_json else None,
+        total_resumes=db_session.total_resumes,
+        processed_count=db_session.processed_count,
+        qualified_count=db_session.qualified_count
+    )
 
 @router.post("/{session_id}/upload")
 async def upload_resumes(
@@ -113,12 +123,22 @@ async def refine_session_criteria(
         
     current_json = json.loads(session.criteria_json) if session.criteria_json else {}
     
+    # Fetch conversation history
+    history_records = db.exec(
+        select(CriteriaConversation)
+        .where(CriteriaConversation.session_id == session_id)
+        .order_by(CriteriaConversation.timestamp.asc())
+    ).all()
+    
+    conversation_history = [{"role": h.role, "message": h.message} for h in history_records]
+
     # Generate refinement
     try:
         new_criteria = await refine_criteria(
             current_human=session.criteria_human_readable,
             current_json=current_json,
-            feedback=request.feedback or request.paste_criteria # Handle paste logic if different
+            feedback=request.feedback or request.paste_criteria,
+            conversation_history=conversation_history
         )
         
         # update session

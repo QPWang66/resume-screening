@@ -7,10 +7,14 @@ async def generate_criteria(job_description: str, notes: str = "") -> dict:
     user_prompt = CRITERIA_GEN_USER_TEMPLATE.format(jd_text=job_description, notes=notes)
     return await llm_client.generate_json(system=CRITERIA_GEN_SYSTEM, user=user_prompt)
 
-async def refine_criteria(current_human: str, current_json: dict, feedback: str) -> dict:
+async def refine_criteria(current_human: str, current_json: dict, feedback: str, conversation_history: list = None) -> dict:
+    history_text = ""
+    if conversation_history:
+        history_text = "\n\nPAST CONVERSATION:\n" + "\n".join([f"{msg['role'].upper()}: {msg['message']}" for msg in conversation_history])
+
     user_prompt = CRITERIA_REFINE_USER_TEMPLATE.format(
         current_human_readable=current_human,
         current_json=json.dumps(current_json, indent=2),
-        hr_message=feedback
+        hr_message=history_text + "\n\nCURRENT REQUEST: " + feedback
     )
     return await llm_client.generate_json(system=CRITERIA_REFINE_SYSTEM, user=user_prompt)

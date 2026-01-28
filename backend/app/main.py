@@ -43,3 +43,8 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+@app.get("/status/llm")
+async def llm_status():
+    from app.services.llm.client import llm_client
+    return await llm_client.check_health()

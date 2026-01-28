@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     
     # LLM
     ANTHROPIC_API_KEY: Optional[str] = None
+    LLM_PROVIDER: str = "openai" 
+    LLM_BASE_URL: Optional[str] = "http://localhost:11434/v1"
+    LLM_MODEL: str = "llama3.2"
+
     
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

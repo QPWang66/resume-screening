@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Download, Filter, Search, BarChart3 } from 'lucide-react';
+import { Download, Filter, Search, BarChart3, SlidersHorizontal } from 'lucide-react';
 import CandidateCard from './CandidateCard';
 
 export default function ResultsDashboard({ results, onExport, onSelectCandidate }) {
-    const { candidates, insights, session } = results;
-
+    const { candidates, session } = results;
     const [filterMode, setFilterMode] = useState('all'); // all, qualified, rejected
 
     const filteredCandidates = candidates.filter(c => {
@@ -14,64 +13,55 @@ export default function ResultsDashboard({ results, onExport, onSelectCandidate 
     });
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8 pb-20">
+        <div className="max-w-7xl mx-auto space-y-8 pb-32 animate-enter">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-2 border-secondary/10 pb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Screening Results</h1>
-                    <p className="text-gray-500">Found {session.qualified_count} qualified candidates from {session.total} resumes</p>
+                    <p className="font-mono text-sm text-secondary/50 uppercase tracking-widest mb-2">Screening Complete</p>
+                    <h1 className="text-5xl font-display font-semibold text-secondary">
+                        Found <span className="text-primary">{session.qualified_count}</span> <br />
+                        Matches
+                    </h1>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                     <button
-                        className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                         onClick={onExport}
+                        className="btn-primary py-2 px-6 text-sm shadow-sharp hover:shadow-sharp-lg flex items-center gap-2"
                     >
                         <Download className="w-4 h-4" />
-                        Export CSV
+                        <span>EXPORT CSV</span>
                     </button>
-                </div>
-            </div>
-
-            {/* Stats / Insights Row (Placeholder for more complex charts) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
-                    <div>
-                        <p className="text-sm text-gray-500">Average Score</p>
-                        <p className="text-2xl font-bold text-gray-900">
-                            {candidates.length > 0 ? Math.round(candidates.reduce((acc, c) => acc + (c.final_score || 0), 0) / candidates.length) : 0}
-                        </p>
-                    </div>
-                    <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                        <BarChart3 className="w-5 h-5" />
-                    </div>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="space-y-4">
-                <div className="flex items-center gap-2 border-b border-gray-200 pb-4">
-                    <button
-                        onClick={() => setFilterMode('all')}
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${filterMode === 'all' ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-                    >
-                        All Candidates <span className="opacity-60 ml-1">{candidates.length}</span>
-                    </button>
-                    <button
-                        onClick={() => setFilterMode('qualified')}
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${filterMode === 'qualified' ? 'bg-green-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-                    >
-                        Qualified <span className="opacity-60 ml-1">{session.qualified_count}</span>
-                    </button>
-                    <button
-                        onClick={() => setFilterMode('rejected')}
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${filterMode === 'rejected' ? 'bg-red-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-                    >
-                        Rejected <span className="opacity-60 ml-1">{candidates.length - session.qualified_count}</span>
-                    </button>
+            <div className="space-y-8">
+                {/* Filter Bar */}
+                <div className="flex flex-wrap items-center gap-2">
+                    <div className="bg-white rounded-full border border-secondary/20 p-1 flex items-center shadow-sm">
+                        <button
+                            onClick={() => setFilterMode('all')}
+                            className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${filterMode === 'all' ? 'bg-secondary text-white' : 'text-secondary/60 hover:text-secondary'}`}
+                        >
+                            ALL <span className="text-xs opacity-60 ml-1 font-mono">({candidates.length})</span>
+                        </button>
+                        <button
+                            onClick={() => setFilterMode('qualified')}
+                            className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${filterMode === 'qualified' ? 'bg-accent-green text-white' : 'text-secondary/60 hover:text-accent-green'}`}
+                        >
+                            QUALIFIED <span className="text-xs opacity-60 ml-1 font-mono">({session.qualified_count})</span>
+                        </button>
+                        <button
+                            onClick={() => setFilterMode('rejected')}
+                            className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${filterMode === 'rejected' ? 'bg-accent-red text-white' : 'text-secondary/60 hover:text-accent-red'}`}
+                        >
+                            REJECTED <span className="text-xs opacity-60 ml-1 font-mono">({candidates.length - session.qualified_count})</span>
+                        </button>
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                     {filteredCandidates.map((c, i) => (
                         <CandidateCard
                             key={c.id}
@@ -83,8 +73,10 @@ export default function ResultsDashboard({ results, onExport, onSelectCandidate 
                 </div>
 
                 {filteredCandidates.length === 0 && (
-                    <div className="text-center py-20 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                        <p className="text-gray-500">No candidates match this filter.</p>
+                    <div className="py-32 flex flex-col items-center justify-center border-2 border-dashed border-secondary/10 rounded-3xl bg-white/30 text-center">
+                        <SlidersHorizontal className="w-12 h-12 text-secondary/20 mb-4" />
+                        <p className="font-serif text-xl text-secondary">No candidates match this filter.</p>
+                        <p className="text-secondary/50 mt-1">Try adjusting criteria or viewing all.</p>
                     </div>
                 )}
             </div>

@@ -1,67 +1,78 @@
 import React from 'react';
-import { Star, Check, X, FileText, ChevronRight } from 'lucide-react';
+import { Check, X, FileText, ChevronRight, Star } from 'lucide-react';
 
 export default function CandidateCard({ candidate, rank, onClick }) {
-    // candidate has: id, filename, final_score, passed_dealbreakers, one_liner
+    const isQualified = candidate.passed_dealbreakers;
+    const score = candidate.final_score || 0;
 
     return (
         <div
             onClick={onClick}
-            className={`group relative bg-white rounded-xl border p-5 transition-all hover:shadow-md cursor-pointer ${!candidate.passed_dealbreakers ? 'border-gray-200 opacity-60 bg-gray-50' : 'border-gray-200 hover:border-primary-300'
+            className={`group relative bg-white border-2 rounded-xl p-6 transition-all duration-300 cursor-pointer overflow-hidden ${!isQualified
+                    ? 'border-secondary/10 opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-secondary/30'
+                    : 'border-secondary hover:border-primary hover:-translate-y-1 hover:shadow-sharp'
                 }`}
         >
-            <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center space-x-3">
-                    <div className={`flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm ${rank === 1 ? 'bg-yellow-100 text-yellow-700' :
-                            rank <= 3 ? 'bg-gray-100 text-gray-700' : 'bg-gray-50 text-gray-400'
+            {/* Top Banner */}
+            <div className="flex justify-between items-start mb-4 relative z-10">
+                <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 flex items-center justify-center rounded-lg font-mono font-bold text-lg border-2 ${rank === 1 ? 'bg-accent-yellow border-secondary text-secondary shadow-sm' :
+                            'bg-background border-secondary/10 text-secondary'
                         }`}>
                         #{rank}
                     </div>
                     <div>
-                        <h3 className="font-semibold text-gray-900 line-clamp-1">{candidate.filename.replace('.pdf', '')}</h3>
-                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                        <h3 className="font-serif font-bold text-lg text-secondary line-clamp-1 group-hover:text-primary transition-colors">
+                            {candidate.filename.replace('.pdf', '')}
+                        </h3>
+                        <div className="flex items-center gap-2 text-xs font-mono text-secondary/50">
                             <FileText className="w-3 h-3" />
-                            <span>PDF Resume</span>
+                            <span>PDF_DOCUMENT</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className={`flex flex-col items-end`}>
                     {candidate.final_score !== null && (
-                        <div className={`px-2 py-1 rounded-md text-sm font-bold ${candidate.final_score >= 80 ? 'bg-green-100 text-green-700' :
-                                candidate.final_score >= 60 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-50 text-red-600'
+                        <div className={`text-2xl font-display font-bold ${score >= 80 ? 'text-accent-green' :
+                                score >= 60 ? 'text-accent-yellow' : 'text-accent-red'
                             }`}>
-                            {candidate.final_score}
+                            {score}<span className="text-sm text-secondary/30 font-normal">/100</span>
                         </div>
                     )}
                 </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4 relative z-10">
                 {candidate.one_liner ? (
-                    <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                    <p className="text-sm text-secondary/80 line-clamp-2 leading-relaxed font-medium">
                         "{candidate.one_liner}"
                     </p>
                 ) : (
-                    <p className="text-sm text-gray-400 italic">No summary generated.</p>
+                    <p className="text-sm text-secondary/30 italic">Processing summary...</p>
                 )}
 
-                <div className="flex flex-wrap gap-2">
-                    {!candidate.passed_dealbreakers ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
-                            <X className="w-3 h-3" /> Failed Dealbreakers
+                <div className="flex flex-wrap gap-2 pt-2 border-t border-secondary/5">
+                    {!isQualified ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold bg-accent-red/10 text-accent-red uppercase tracking-wider">
+                            <X className="w-3 h-3" /> Dealbreaker
                         </span>
                     ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold bg-accent-green/10 text-accent-green uppercase tracking-wider">
                             <Check className="w-3 h-3" /> Qualified
+                        </span>
+                    )}
+                    {score > 85 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold bg-accent-yellow/10 text-accent-yellow uppercase tracking-wider">
+                            <Star className="w-3 h-3" /> Top Pick
                         </span>
                     )}
                 </div>
             </div>
 
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <ChevronRight className="w-5 h-5 text-gray-400" />
-            </div>
+            {/* Hover decoration */}
+            <div className={`absolute bottom-0 left-0 h-1 bg-primary transition-all duration-300 ${isQualified ? 'w-0 group-hover:w-full' : 'w-0'
+                }`} />
         </div>
     );
 }

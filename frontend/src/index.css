@@ -1,9 +1,95 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Outfit', sans-serif;
+  --font-serif: 'Fraunces', serif;
+  --font-display: 'Fraunces', serif;
+
+  --color-background: #f2f0e9;
+  --color-surface: #ffffff;
+
+  --color-primary: #e65100;
+  --color-primary-hover: #c2410c;
+  --color-primary-light: #ffccbc;
+
+  --color-secondary: #1c1917;
+  --color-secondary-dim: #44403c;
+
+  --color-accent-green: #15803d;
+  --color-accent-red: #b91c1c;
+  --color-accent-yellow: #a16207;
+
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+
+  --shadow-sharp: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  --shadow-sharp-sm: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+  --shadow-sharp-lg: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+}
 
 @layer base {
   body {
-    @apply antialiased text-gray-900 bg-gray-50;
+    @apply antialiased text-secondary bg-background font-sans selection:bg-primary selection:text-white;
+    background-image:
+      radial-gradient(at 0% 0%, rgba(230, 81, 0, 0.03) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(28, 25, 23, 0.03) 0px, transparent 50%);
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-secondary-dim/20 rounded-full hover:bg-secondary-dim/40 transition-colors;
+  }
+
+  /* Typography Enhancements */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply relative inline-flex items-center justify-center px-8 py-3 bg-secondary text-white font-medium rounded-xl transition-all duration-200 border-2 border-transparent hover:-translate-y-1 hover:shadow-sharp hover:bg-secondary active:translate-y-0 active:shadow-none;
+  }
+
+  .btn-accent {
+    @apply relative inline-flex items-center justify-center px-8 py-3 bg-primary text-white font-medium rounded-xl transition-all duration-200 border-2 border-transparent hover:-translate-y-1 hover:shadow-sharp hover:bg-primary-hover active:translate-y-0 active:shadow-none;
+  }
+
+  .card-brutal {
+    @apply bg-white border-2 border-secondary rounded-2xl transition-all duration-300;
+  }
+
+  .card-hover {
+    @apply hover:-translate-y-1 hover:shadow-sharp;
+  }
+
+  /* Staggered Animation Utilities */
+  .animate-enter {
+    animation: enter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  @keyframes enter {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
