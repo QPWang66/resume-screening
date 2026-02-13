@@ -9,47 +9,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 
 
+import ModelStatus from './components/ModelStatus';
+import SettingsModal from './components/SettingsModal';
+
 const API_Base = 'http://localhost:8000/api';
-
-function ModelStatus() {
-  const [status, setStatus] = useState(null); // { status: "online"|"offline", provider, model }
-
-  useEffect(() => {
-    const checkStatus = async () => {
-      try {
-        const res = await fetch(`http://localhost:8000/status/llm`);
-        if (res.ok) {
-          const data = await res.json();
-          setStatus(data);
-        } else {
-          setStatus({ status: 'offline' });
-        }
-      } catch (e) {
-        setStatus({ status: 'offline' });
-      }
-    };
-
-    checkStatus();
-    const interval = setInterval(checkStatus, 10000); // Check every 10s
-    return () => clearInterval(interval);
-  }, []);
-
-  if (!status) return null;
-
-  return (
-    <div className={`flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-mono uppercase tracking-wider ${status.status === 'online'
-      ? 'bg-accent-green/10 border-accent-green/20 text-accent-green'
-      : 'bg-accent-red/10 border-accent-red/20 text-accent-red'
-      }`}>
-      <div className={`w-2 h-2 rounded-full ${status.status === 'online' ? 'bg-accent-green animate-pulse' : 'bg-accent-red'}`} />
-      {status.status === 'online' ? (
-        <span>{status.provider} :: {status.model}</span>
-      ) : (
-        <span>LLM OFFLINE</span>
-      )}
-    </div>
-  );
-}
 
 function App() {
   const [step, setStep] = useState('upload'); // upload, criteria, processing, results
@@ -60,6 +23,7 @@ function App() {
   const [selectedCandidateId, setSelectedCandidateId] = useState(null);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // 1. Start Screening -> Create Session & Get Initial Criteria
   const handleStart = async (data) => {
@@ -186,7 +150,7 @@ function App() {
         </div>
 
         <div className="flex items-center gap-4">
-          <ModelStatus />
+          <ModelStatus onOpenSettings={() => setIsSettingsOpen(true)} />
           {step !== 'upload' && (
             <div className="text-xs font-mono bg-white border border-secondary/20 px-3 py-1 rounded-full text-secondary/60">
               SESSION_ID: {sessionId?.slice(0, 8)}
@@ -261,7 +225,12 @@ function App() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
+    </div >
   );
 }
 

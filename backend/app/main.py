@@ -18,9 +18,10 @@ app = FastAPI(
 )
 
 # Routers
-from app.api import screening, export
+from app.api import screening, export, config
 app.include_router(screening.router, prefix=settings.API_PREFIX)
 app.include_router(export.router, prefix=settings.API_PREFIX)
+app.include_router(config.router, prefix=settings.API_PREFIX)
 
 # CORS
 origins = [
