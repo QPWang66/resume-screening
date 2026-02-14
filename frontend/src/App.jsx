@@ -38,7 +38,20 @@ function App() {
           hr_notes: data.notes
         })
       });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.detail || `Server error: ${res.status}`);
+      }
+
       const session = await res.json();
+
+      // Validate that we got criteria
+      if (!session.criteria_human_readable) {
+        console.error("Session response missing criteria:", session);
+        throw new Error("Failed to generate criteria. Please try again.");
+      }
+
       setSessionId(session.id);
       setSessionData(session);
       setCriteria({

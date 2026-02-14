@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
-import { Download, Filter, Search, BarChart3, SlidersHorizontal } from 'lucide-react';
+import { Download, Filter, Search, BarChart3, SlidersHorizontal, AlertTriangle } from 'lucide-react';
 import CandidateCard from './CandidateCard';
 
 export default function ResultsDashboard({ results, onExport, onSelectCandidate }) {
     const { candidates, session } = results;
-    const [filterMode, setFilterMode] = useState('all'); // all, qualified, rejected
+    const [filterMode, setFilterMode] = useState('all'); // all, qualified, rejected, skipped
+
+    // Count skipped candidates
+    const skippedCount = candidates.filter(c => c.skipped).length;
+    const processedCount = candidates.filter(c => !c.skipped).length;
+    const rejectedCount = processedCount - session.qualified_count;
 
     const filteredCandidates = candidates.filter(c => {
-        if (filterMode === 'qualified') return c.passed_dealbreakers;
-        if (filterMode === 'rejected') return !c.passed_dealbreakers;
+        if (filterMode === 'qualified') return c.passed_dealbreakers && !c.skipped;
+        if (filterMode === 'rejected') return !c.passed_dealbreakers && !c.skipped;
+        if (filterMode === 'skipped') return c.skipped;
         return true;
     });
 
@@ -22,6 +28,12 @@ export default function ResultsDashboard({ results, onExport, onSelectCandidate 
                         Found <span className="text-primary">{session.qualified_count}</span> <br />
                         Matches
                     </h1>
+                    {skippedCount > 0 && (
+                        <p className="text-sm text-accent-yellow mt-2 flex items-center gap-1">
+                            <AlertTriangle className="w-4 h-4" />
+                            {skippedCount} resume{skippedCount > 1 ? 's' : ''} could not be processed
+                        </p>
+                    )}
                 </div>
 
                 <div className="flex gap-4">
@@ -39,7 +51,7 @@ export default function ResultsDashboard({ results, onExport, onSelectCandidate 
             <div className="space-y-8">
                 {/* Filter Bar */}
                 <div className="flex flex-wrap items-center gap-2">
-                    <div className="bg-white rounded-full border border-secondary/20 p-1 flex items-center shadow-sm">
+                    <div className="bg-white rounded-full border border-secondary/20 p-1 flex items-center shadow-sm flex-wrap">
                         <button
                             onClick={() => setFilterMode('all')}
                             className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${filterMode === 'all' ? 'bg-secondary text-white' : 'text-secondary/60 hover:text-secondary'}`}
@@ -56,8 +68,16 @@ export default function ResultsDashboard({ results, onExport, onSelectCandidate 
                             onClick={() => setFilterMode('rejected')}
                             className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${filterMode === 'rejected' ? 'bg-accent-red text-white' : 'text-secondary/60 hover:text-accent-red'}`}
                         >
-                            REJECTED <span className="text-xs opacity-60 ml-1 font-mono">({candidates.length - session.qualified_count})</span>
+                            REJECTED <span className="text-xs opacity-60 ml-1 font-mono">({rejectedCount})</span>
                         </button>
+                        {skippedCount > 0 && (
+                            <button
+                                onClick={() => setFilterMode('skipped')}
+                                className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${filterMode === 'skipped' ? 'bg-accent-yellow text-white' : 'text-secondary/60 hover:text-accent-yellow'}`}
+                            >
+                                SKIPPED <span className="text-xs opacity-60 ml-1 font-mono">({skippedCount})</span>
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -66,8 +86,8 @@ export default function ResultsDashboard({ results, onExport, onSelectCandidate 
                         <CandidateCard
                             key={c.id}
                             candidate={c}
-                            rank={i + 1}
-                            onClick={() => onSelectCandidate(c.id)}
+                            rank={c.skipped ? null : i + 1}
+                            onClick={() => !c.skipped && onSelectCandidate(c.id)}
                         />
                     ))}
                 </div>

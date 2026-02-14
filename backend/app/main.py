@@ -23,9 +23,13 @@ app.include_router(screening.router, prefix=settings.API_PREFIX)
 app.include_router(export.router, prefix=settings.API_PREFIX)
 app.include_router(config.router, prefix=settings.API_PREFIX)
 
-# CORS
+# CORS - allow all localhost ports for development
 origins = [
-    "http://localhost:5173",  # Vite default
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://localhost:5176",
+    "http://localhost:5177",
     "http://localhost:3000",
 ]
 

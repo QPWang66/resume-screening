@@ -1,9 +1,52 @@
 import React from 'react';
-import { Check, X, FileText, ChevronRight, Star } from 'lucide-react';
+import { Check, X, FileText, ChevronRight, Star, AlertTriangle } from 'lucide-react';
 
 export default function CandidateCard({ candidate, rank, onClick }) {
     const isQualified = candidate.passed_dealbreakers;
+    const isSkipped = candidate.skipped;
     const score = candidate.final_score || 0;
+
+    // Handle skipped/failed PDF extraction
+    if (isSkipped) {
+        return (
+            <div
+                className="group relative bg-white border-2 border-dashed border-accent-yellow/50 rounded-xl p-6 opacity-70"
+            >
+                <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 flex items-center justify-center rounded-lg font-mono bg-accent-yellow/10 border-2 border-accent-yellow/30 text-accent-yellow">
+                            <AlertTriangle className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h3 className="font-serif font-bold text-lg text-secondary line-clamp-1">
+                                {candidate.filename.replace('.pdf', '')}
+                            </h3>
+                            <div className="flex items-center gap-2 text-xs font-mono text-secondary/50">
+                                <FileText className="w-3 h-3" />
+                                <span>PDF_DOCUMENT</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-3">
+                    <div className="flex items-start gap-2 p-3 bg-accent-yellow/5 rounded-lg border border-accent-yellow/20">
+                        <AlertTriangle className="w-4 h-4 text-accent-yellow flex-shrink-0 mt-0.5" />
+                        <div>
+                            <p className="text-sm font-medium text-secondary/80">Could not process this resume</p>
+                            <p className="text-xs text-secondary/50 mt-1">{candidate.extraction_warning}</p>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 pt-2 border-t border-secondary/5">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold bg-accent-yellow/10 text-accent-yellow uppercase tracking-wider">
+                            <AlertTriangle className="w-3 h-3" /> Skipped
+                        </span>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div

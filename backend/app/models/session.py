@@ -8,17 +8,21 @@ class ScreeningSessionBase(SQLModel):
     job_description: str
     keep_count: int
     hr_notes: Optional[str] = None
-    
+
     # Criteria
     criteria_human_readable: Optional[str] = None
     criteria_json: Optional[str] = None # Stored as JSON string
     criteria_version: int = 1
-    
+
     # Stats (Denormalized)
     total_resumes: int = 0
     processed_count: int = 0
     qualified_count: int = 0
-    
+
+    # Token usage tracking
+    total_input_tokens: int = 0
+    total_output_tokens: int = 0
+
     status: str = "draft" # draft, criteria_locked, processing, completed
     insights_json: Optional[str] = None
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Settings } from 'lucide-react';
 
-const API_Base = 'http://localhost:8000'; // Adjust if needed or pass as prop
+const API_Base = 'http://localhost:8000';
 
 export default function ModelStatus({ onOpenSettings }) {
     const [status, setStatus] = useState(null); // { status: "online"|"offline", provider, model }

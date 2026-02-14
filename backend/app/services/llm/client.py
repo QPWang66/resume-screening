@@ -100,12 +100,20 @@ class LLMClient:
         except Exception as e:
             return {"status": "error", "provider": self.provider, "error": str(e)}
 
-    async def generate_json(self, system: str, user: str, model: str = None) -> dict:
+    async def generate_json(self, system: str, user: str, model: str = None) -> tuple[dict, dict]:
+        """
+        Generate JSON response from LLM.
+
+        Returns:
+            tuple: (parsed_json_response, usage_dict)
+            usage_dict contains: input_tokens, output_tokens, model
+        """
         if not self.client:
             raise ValueError(f"LLM Client ({self.provider}) not initialized properly.")
-            
+
         target_model = model or self.model
-        
+        usage = {"input_tokens": 0, "output_tokens": 0, "model": target_model}
+
         try:
             if self.provider == "anthropic":
                 message = await self.client.messages.create(
@@ -118,7 +126,12 @@ class LLMClient:
                     ]
                 )
                 content = message.content[0].text
-                
+                usage = {
+                    "input_tokens": message.usage.input_tokens,
+                    "output_tokens": message.usage.output_tokens,
+                    "model": target_model
+                }
+
             elif self.provider == "openai":
                 response = await self.client.chat.completions.create(
                     model=target_model,
@@ -127,24 +140,35 @@ class LLMClient:
                         {"role": "user", "content": user}
                     ],
                     temperature=0,
-                    # response_format={"type": "json_object"} # Ollama supports this with recent versions (check model support)
-                     # NOTE: Llama3.2 supports json mode, but some older models might not. 
-                     # For robustness with dynamic models, we might want to try/except this or make it conditional.
-                     # For now let's keep it simple, or maybe remove response_format if it causes issues with non-json models.
-                     # But since we ask for JSON in prompt, let's try strict mode if possible or just rely on prompt.
                     response_format={"type": "json_object"}
                 )
                 content = response.choices[0].message.content
-            
+                usage = {
+                    "input_tokens": response.usage.prompt_tokens if response.usage else 0,
+                    "output_tokens": response.usage.completion_tokens if response.usage else 0,
+                    "model": target_model
+                }
+
             # Extract JSON from response if needed (Ollama json_object mode usually returns raw JSON)
             # But just in case of markdown wrapping:
             if "```json" in content:
                 content = content.split("```json")[1].split("```")[0]
             elif "```" in content:
                 content = content.split("```")[1].split("```")[0]
-                
-            return json.loads(content.strip())
-            
+
+            parsed = json.loads(content.strip())
+
+            # Validate that we got expected fields for criteria responses
+            if "human_readable" not in parsed and "structured" not in parsed:
+                logger.warning(f"LLM response missing expected fields. Keys: {list(parsed.keys())}")
+                logger.debug(f"Full response: {content[:500]}")
+
+            return parsed, usage
+
+        except json.JSONDecodeError as e:
+            logger.error(f"LLM JSON parse error ({self.provider}): {e}")
+            logger.error(f"Raw content: {content[:1000] if content else 'empty'}")
+            raise ValueError(f"Failed to parse LLM response as JSON: {e}")
         except Exception as e:
             logger.error(f"LLM Error ({self.provider}): {e}")
             raise e

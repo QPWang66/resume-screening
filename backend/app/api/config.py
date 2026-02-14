@@ -25,3 +25,8 @@ async def update_llm_config(config: LLMConfig):
 async def list_llm_models():
     """List available models from the current provider."""
     return await llm_client.list_models()
+
+@router.get("/llm/status", response_model=dict)
+async def get_llm_status():
+    """Check LLM provider health status."""
+    return await llm_client.check_health()

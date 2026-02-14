@@ -53,3 +53,15 @@ backend/data/*.db
 *.swp
 *.swo
 
+# Claude Code temp files
+tmpclaude-*
+.claude/
+
+# Data directory (keep README)
+data/*
+!data/README.md
+!data/uploads/
+data/uploads/*
+!data/uploads/.gitkeep
+resumes/
+
