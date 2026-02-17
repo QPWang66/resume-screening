@@ -1,10 +1,17 @@
 import React from 'react';
-import { Check, X, FileText, ChevronRight, Star, AlertTriangle } from 'lucide-react';
+import { Check, X, FileText, ChevronRight, Star, AlertTriangle, ExternalLink } from 'lucide-react';
 
-export default function CandidateCard({ candidate, rank, onClick }) {
+const API_Base = 'http://localhost:8000/api';
+
+export default function CandidateCard({ candidate, rank, onClick, sessionId }) {
     const isQualified = candidate.passed_dealbreakers;
     const isSkipped = candidate.skipped;
     const score = candidate.final_score || 0;
+
+    const handleViewPdf = (e) => {
+        e.stopPropagation();
+        window.open(`${API_Base}/screening/${sessionId}/resume/${candidate.id}`, '_blank');
+    };
 
     // Handle skipped/failed PDF extraction
     if (isSkipped) {
@@ -57,15 +64,15 @@ export default function CandidateCard({ candidate, rank, onClick }) {
                 }`}
         >
             {/* Top Banner */}
-            <div className="flex justify-between items-start mb-4 relative z-10">
-                <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 flex items-center justify-center rounded-lg font-mono font-bold text-lg border-2 ${rank === 1 ? 'bg-accent-yellow border-secondary text-secondary shadow-sm' :
+            <div className="flex justify-between items-start mb-4 relative z-10 gap-3">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className={`w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-lg font-mono font-bold text-lg border-2 ${rank === 1 ? 'bg-accent-yellow border-secondary text-secondary shadow-sm' :
                             'bg-background border-secondary/10 text-secondary'
                         }`}>
                         #{rank}
                     </div>
-                    <div>
-                        <h3 className="font-serif font-bold text-lg text-secondary line-clamp-1 group-hover:text-primary transition-colors">
+                    <div className="min-w-0 flex-1">
+                        <h3 className="font-serif font-bold text-lg text-secondary truncate group-hover:text-primary transition-colors" title={candidate.filename.replace('.pdf', '')}>
                             {candidate.filename.replace('.pdf', '')}
                         </h3>
                         <div className="flex items-center gap-2 text-xs font-mono text-secondary/50">
@@ -75,9 +82,9 @@ export default function CandidateCard({ candidate, rank, onClick }) {
                     </div>
                 </div>
 
-                <div className={`flex flex-col items-end`}>
+                <div className="flex-shrink-0 flex flex-col items-end">
                     {candidate.final_score !== null && (
-                        <div className={`text-2xl font-display font-bold ${score >= 80 ? 'text-accent-green' :
+                        <div className={`text-2xl font-display font-bold whitespace-nowrap ${score >= 80 ? 'text-accent-green' :
                                 score >= 60 ? 'text-accent-yellow' : 'text-accent-red'
                             }`}>
                             {score}<span className="text-sm text-secondary/30 font-normal">/100</span>
@@ -95,7 +102,7 @@ export default function CandidateCard({ candidate, rank, onClick }) {
                     <p className="text-sm text-secondary/30 italic">Processing summary...</p>
                 )}
 
-                <div className="flex flex-wrap gap-2 pt-2 border-t border-secondary/5">
+                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-secondary/5">
                     {!isQualified ? (
                         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold bg-accent-red/10 text-accent-red uppercase tracking-wider">
                             <X className="w-3 h-3" /> Dealbreaker
@@ -110,6 +117,13 @@ export default function CandidateCard({ candidate, rank, onClick }) {
                             <Star className="w-3 h-3" /> Top Pick
                         </span>
                     )}
+                    <button
+                        onClick={handleViewPdf}
+                        className="ml-auto inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold bg-secondary/5 text-secondary/60 hover:bg-secondary/10 hover:text-secondary transition-colors uppercase tracking-wider"
+                        title="View PDF"
+                    >
+                        <ExternalLink className="w-3 h-3" /> View PDF
+                    </button>
                 </div>
             </div>
 

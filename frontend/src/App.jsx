@@ -205,6 +205,7 @@ function App() {
                 results={results}
                 onExport={handleExport}
                 onSelectCandidate={handleSelectCandidate}
+                sessionId={sessionId}
               />
             )}
           </motion.div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Download, Filter, Search, BarChart3, SlidersHorizontal, AlertTriangle } from 'lucide-react';
 import CandidateCard from './CandidateCard';
 
-export default function ResultsDashboard({ results, onExport, onSelectCandidate }) {
+export default function ResultsDashboard({ results, onExport, onSelectCandidate, sessionId }) {
     const { candidates, session } = results;
     const [filterMode, setFilterMode] = useState('all'); // all, qualified, rejected, skipped
 
@@ -88,6 +88,7 @@ export default function ResultsDashboard({ results, onExport, onSelectCandidate 
                             candidate={c}
                             rank={c.skipped ? null : i + 1}
                             onClick={() => !c.skipped && onSelectCandidate(c.id)}
+                            sessionId={sessionId}
                         />
                     ))}
                 </div>

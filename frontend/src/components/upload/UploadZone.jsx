@@ -97,11 +97,11 @@ export default function UploadZone({ onStart }) {
                                     <input
                                         type="number"
                                         min="1"
-                                        className="w-full p-4 bg-background/50 rounded-xl border-2 border-transparent focus:border-primary focus:bg-white focus:outline-none transition-all font-mono text-lg font-bold"
+                                        className="w-full p-4 pr-28 bg-background/50 rounded-xl border-2 border-transparent focus:border-primary focus:bg-white focus:outline-none transition-all font-mono text-lg font-bold"
                                         value={keepCount}
-                                        onChange={(e) => setKeepCount(parseInt(e.target.value))}
+                                        onChange={(e) => setKeepCount(parseInt(e.target.value) || 1)}
                                     />
-                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-secondary/40 font-serif italic">candidates</div>
+                                    <div className="absolute right-10 top-1/2 -translate-y-1/2 text-sm text-secondary/40 font-serif italic pointer-events-none">candidates</div>
                                 </div>
                             </div>
                             <div className="space-y-1">
